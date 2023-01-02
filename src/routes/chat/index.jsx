@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 function ChatListItem({ username, message, unread }) {
     return (
-        <Box display="flex" alignItems="center" gap={2} p={1} component={Link} href={`/chat/${username}`} sx={{
+        <Box display="flex" alignItems="center" gap={2} p={1} component={Link} href={`/chat/t/${username}`} sx={{
             borderRadius: 1,
             textDecoration: 'none',
             '&:hover': {
@@ -64,7 +64,7 @@ export default function Chat() {
                 
             </Box>
 
-            <Fab color="purple" sx={{ position: "absolute", right: 32, bottom: 32 }}>
+            <Fab color="purple" sx={{ position: "absolute", right: 32, bottom: 32 }} component={Link} href="/chat/new">
                 <AddIcon sx={{ color: "#fff" }} />
             </Fab>
         </Box>

@@ -8,6 +8,7 @@ import Root from './routes/root'
 import './index.css'
 import Landing from './routes/landing'
 import Chat from './routes/chat'
+import NewChat from './routes/chat/new'
 
 const router = createBrowserRouter([
   {
@@ -20,9 +21,12 @@ const router = createBrowserRouter([
       },
       {
         path: 'chat',
-        element: <Chat />
+        element: <Chat />,
       },
-      
+      {
+        path: 'chat/new',
+        element: <NewChat />
+      }      
     ]
   }
 ])
