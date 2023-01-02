@@ -3,16 +3,19 @@ import TextField from '@mui/material/TextField'
 import { Box } from '@mui/system'
 import { Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 export default function Landing() {
     const navigate = useNavigate();
 
-    const hasUser = localStorage.getItem('username')
-
-    if (hasUser) {
-        navigate('/chat')
-        return null
-    }
+    useEffect(() => {
+        const hasUser = localStorage.getItem('username')
+    
+        if (hasUser) {
+            navigate('/chat')
+            return null
+        }
+    }, [])
 
     const handleClickEnter = () => {
         const username = document.getElementById('username').value
