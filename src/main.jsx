@@ -7,6 +7,7 @@ import {
 import Root from './routes/root'
 import './index.css'
 import Landing from './routes/landing'
+import Chat from './routes/chat'
 
 const router = createBrowserRouter([
   {
@@ -16,7 +17,12 @@ const router = createBrowserRouter([
       {
         path: 'welcome',
         element: <Landing />
-      }
+      },
+      {
+        path: 'chat',
+        element: <Chat />
+      },
+      
     ]
   }
 ])
