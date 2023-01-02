@@ -9,6 +9,7 @@ import './index.css'
 import Landing from './routes/landing'
 import Chat from './routes/chat'
 import NewChat from './routes/chat/new'
+import ChatThread from './routes/chat/thread'
 
 const router = createBrowserRouter([
   {
@@ -26,7 +27,11 @@ const router = createBrowserRouter([
       {
         path: 'chat/new',
         element: <NewChat />
-      }      
+      },
+      {
+        path: 'chat/t/:username',
+        element: <ChatThread />
+      }
     ]
   }
 ])
