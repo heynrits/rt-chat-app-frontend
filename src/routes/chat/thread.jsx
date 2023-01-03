@@ -5,6 +5,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect } from "react";
+import { socket } from '../../api/socket'
 
 function ChatBubble({ incoming, message }) {
     const adjacentSibling = `& + .${incoming ? 'outgoing-chat' : 'incoming-chat'}`;
@@ -31,9 +32,10 @@ function ChatBubble({ incoming, message }) {
 }
 
 export default function ChatThread() {
-    const { username } = useParams()
+    const sender = localStorage.getItem('username') // current user
+    
+    const { username: recipient } = useParams() // recipient user
     const location = useLocation()
-    const recipient = username
     const [message, setMessage] = useState('')
 
     const messages = [
@@ -47,8 +49,8 @@ export default function ChatThread() {
     const threadRef = useRef()
     const handleSendMessage = () => {
         setThread((t) => [...t, { incoming: false, message }])
-
         setMessage('')
+        socket.emit('chat', { sender, recipient, message })
     }
 
     const scrollToBottom = () => {
@@ -68,6 +70,16 @@ export default function ChatThread() {
 
         return () => {
             setThread([])
+        }
+    }, [])
+
+    useEffect(() => {
+        socket.on(`chat::${recipient}:${sender}`, (message) => {
+            setThread((t) => [...t, { incoming: true, message }])
+        })   
+
+        return () => {
+            socket.off(`chat::${recipient}:${sender}`)
         }
     }, [])
 

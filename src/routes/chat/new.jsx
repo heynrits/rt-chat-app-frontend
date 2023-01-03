@@ -4,6 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { socket } from '../../api/socket'
 
 export default function NewChat() {
     const navigate = useNavigate()
@@ -13,7 +14,9 @@ export default function NewChat() {
 
     const sendDisabled = recipient.length === 0 || message.length === 0
 
+    const sender = localStorage.getItem('username') // current user
     const handleSendMessage = () => {
+        socket.emit('chat', { sender, recipient, message })
         navigate(`/chat/t/${recipient}`, { state: { initialMessage: message }})
     }
 
