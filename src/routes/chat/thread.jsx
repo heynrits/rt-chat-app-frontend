@@ -3,7 +3,7 @@ import { IconButton, InputAdornment, Link, TextField, Typography } from "@mui/ma
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import { useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useEffect } from "react";
 
 function ChatBubble({ incoming, message }) {
@@ -32,38 +32,15 @@ function ChatBubble({ incoming, message }) {
 
 export default function ChatThread() {
     const { username } = useParams()
+    const location = useLocation()
     const recipient = username
     const [message, setMessage] = useState('')
 
     const messages = [
-        {
-            incoming: false,
-            message: 'Hi lorem ipsum!'
-        },
-        {
-            incoming: true,
-            message: 'Palagi na lang lorem ipsum!'
-        },
-        {
-            incoming: true,
-            message: 'Vivamus id ex lobortis mauris fermentum ornare. Aenean vestibulum vulputate diam, a aliquet arcu sagittis nec. Fusce imperdiet velit sit amet orci bibendum imperdiet.'
-        },
-        {
-            incoming: false,
-            message: 'Quisque consectetur odio arcu, eu interdum risus aliquam a. Morbi eros augue, vulputate eget iaculis vel, lacinia ut sem. Pellentesque rutrum purus ipsum???'
-        },
-        {
-            incoming: false,
-            message: 'Quisque consectetur odio arcu, eu interdum risus aliquam a. Morbi eros augue, vulputate eget iaculis vel, lacinia ut sem. Pellentesque rutrum purus ipsum???'
-        },
-        {
-            incoming: false,
-            message: 'Quisque consectetur odio arcu, eu interdum risus aliquam a. Morbi eros augue, vulputate eget iaculis vel, lacinia ut sem. Pellentesque rutrum purus ipsum???'
-        },
-        {
-            incoming: true,
-            message: 'Quisque consectetur odio arcu, eu interdum risus aliquam a. Morbi eros augue, vulputate eget iaculis vel, lacinia ut sem. Pellentesque rutrum purus ipsum???'
-        },
+        // {
+        //     incoming: false,
+        //     message: 'Hi lorem ipsum!'
+        // },
     ]
 
     const [thread, setThread] = useState(messages)
@@ -82,6 +59,17 @@ export default function ChatThread() {
         scrollToBottom()
     }, [thread])
 
+    useEffect(() => {
+        // Start of a new conversation
+        if (location.state && thread.length == 0) {
+            setThread((t) => [...t, { incoming: false, message: location.state.initialMessage}])
+            window.history.replaceState({}, document.title) // clear the location state after consuming the initial message
+        }
+
+        return () => {
+            setThread([])
+        }
+    }, [])
 
     return (
         <>

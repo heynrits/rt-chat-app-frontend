@@ -3,13 +3,19 @@ import { IconButton, InputAdornment, Link, TextField, Typography } from "@mui/ma
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function NewChat() {
+    const navigate = useNavigate()
 
     const [recipient, setRecipient] = useState('')
     const [message, setMessage] = useState('')
 
     const sendDisabled = recipient.length === 0 || message.length === 0
+
+    const handleSendMessage = () => {
+        navigate(`/chat/t/${recipient}`, { state: { initialMessage: message }})
+    }
 
     return (
         <>
@@ -56,8 +62,13 @@ export default function NewChat() {
                     color="purple"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSendMessage()
+                        }
+                    }}
                 />
-                <IconButton aria-label="send" color="purple" disabled={sendDisabled}>
+                <IconButton onClick={handleSendMessage} aria-label="send" color="purple" disabled={sendDisabled}>
                     <SendIcon />
                 </IconButton>
             </Box>
