@@ -19,9 +19,13 @@ function ChatListItem({ username, message, unread }) {
             <Box sx={{ width: 50, height: 50, background: '#d9d9d9', borderRadius: 10, display: 'grid', placeItems: 'center' }}>
                 <PersonIcon sx={{ color: '#6E42CC' }} />
             </Box>
-            <Box flex={1}>
+            <Box flex={1} sx={{ overflow: 'hidden' }}>
                 <Typography variant="body2" fontWeight={unread ? 700 : 400} color={unread ? '#181818' : '#434343'}>@{username}</Typography>
-                <Typography variant="body2" fontWeight={unread ? 700 : 400} color={unread ? '#181818' : '#5a5a5a'}>{message}</Typography>
+                <Typography variant="body2" fontWeight={unread ? 700 : 400} color={unread ? '#181818' : '#5a5a5a'} sx={{
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap'
+                }}>{message}</Typography>
             </Box>
         </Box>
     )
