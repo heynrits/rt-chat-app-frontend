@@ -2,6 +2,10 @@ import { Fab, Link, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
+import { useEffect } from "react";
+import { getChats } from "../../api/chat";
+import { useState } from "react";
+import { socket } from "../../api/socket";
 
 function ChatListItem({ username, message, unread }) {
     return (
@@ -24,31 +28,41 @@ function ChatListItem({ username, message, unread }) {
 }
 
 export default function Chat() {
-    const chats = [
-        {
-            username: 'anotheruser',
-            message: 'Hello, welcome to Chat!',
-            unread: true
-        },
-        {
-            username: 'notyourfriend',
-            message: 'Huh?'
-        },
-        {
-            username: 'lorem_ipsum',
-            message: 'The quick brown fox jumps over the lazy dog.'
-        },
-    ]
+    const [chats, setChats] = useState([])
+
+    useEffect(() => {
+        (async function () {
+            console.log('iife')
+            const user = localStorage.getItem('username')
+            const chats = await getChats(user)
+            setChats(chats)
+        })()
+    }, [])
+
+    const user = localStorage.getItem('username')
+    useEffect(() => {
+        socket.on(`new message:${user}`, () => {
+            (async function () {
+                console.log('iife 2')
+                const chats = await getChats(user)
+                setChats(chats)
+            })()
+        })
+
+        return () => {
+            socket.off(`new message:${user}`)
+        }
+    })
 
     return (
         <Box sx={{ px: 4 }}>
             <Typography variant='h3' py={5} textAlign="center" color="#6E42CC">Chat</Typography>
 
             <Box>
-                { chats.length > 0 ?
+                {chats.length > 0 ?
                     chats.map(
-                        ({ username, message, unread }) => (
-                            <ChatListItem key={username} username={username} message={message} unread={unread} />
+                        ({ _id, recipient, lastMessage, unread }) => (
+                            <ChatListItem key={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} />
                         )
                     )
                     :
@@ -61,7 +75,7 @@ export default function Chat() {
                         transform: 'translate(-50%, -50%)'
                     }}>Tap "+" to start chatting!</Typography>
                 }
-                
+
             </Box>
 
             <Fab color="purple" sx={{ position: "absolute", right: 32, bottom: 32 }} component={Link} href="/chat/new">

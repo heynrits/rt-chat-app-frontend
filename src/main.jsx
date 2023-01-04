@@ -10,6 +10,9 @@ import Landing from './routes/landing'
 import Chat from './routes/chat'
 import NewChat from './routes/chat/new'
 import ChatThread from './routes/chat/thread'
+import Axios from 'axios'
+
+Axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL
 
 const router = createBrowserRouter([
   {
