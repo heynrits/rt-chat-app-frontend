@@ -32,7 +32,7 @@ const router = createBrowserRouter([
         element: <NewChat />
       },
       {
-        path: 'chat/t/:username',
+        path: 'chat/t/:threadId',
         element: <ChatThread />
       }
     ]

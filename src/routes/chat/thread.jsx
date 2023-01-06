@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { socket } from '../../api/socket'
+import { getThread } from "../../api/chat";
 
 function ChatBubble({ incoming, message }) {
     const adjacentSibling = `& + .${incoming ? 'outgoing-chat' : 'incoming-chat'}`;
@@ -13,19 +14,19 @@ function ChatBubble({ incoming, message }) {
     return (
         <Box
             className={incoming ? 'incoming-chat' : 'outgoing-chat'} sx={{
-            px: 3,
-            py: 1.5,
-            background: incoming ? '#DDDDDD' : '#6E42CC',
-            display: 'inline-block',
-            borderRadius: 1,
-            flexShrink: 1,
-            alignSelf: incoming ? 'flex-start' : 'flex-end',
-            mr: incoming ? 8 : 0,
-            ml: incoming ? 0 : 8,
-            [adjacentSibling]: {
-                mt: 2
-            }
-        }}>
+                px: 3,
+                py: 1.5,
+                background: incoming ? '#DDDDDD' : '#6E42CC',
+                display: 'inline-block',
+                borderRadius: 1,
+                flexShrink: 1,
+                alignSelf: incoming ? 'flex-start' : 'flex-end',
+                mr: incoming ? 8 : 0,
+                ml: incoming ? 0 : 8,
+                [adjacentSibling]: {
+                    mt: 2
+                }
+            }}>
             <Typography variant="body2" color={incoming ? "#2B2B2B" : "#fff"}>{message}</Typography>
         </Box>
     )
@@ -33,19 +34,14 @@ function ChatBubble({ incoming, message }) {
 
 export default function ChatThread() {
     const sender = localStorage.getItem('username') // current user
-    
-    const { username: recipient } = useParams() // recipient user
+
+    const { threadId } = useParams()
+    const [recipient, setRecipient] = useState('') // recipient user
+
     const location = useLocation()
     const [message, setMessage] = useState('')
 
-    const messages = [
-        // {
-        //     incoming: false,
-        //     message: 'Hi lorem ipsum!'
-        // },
-    ]
-
-    const [thread, setThread] = useState(messages)
+    const [thread, setThread] = useState([])
     const threadRef = useRef()
     const handleSendMessage = () => {
         setThread((t) => [...t, { incoming: false, message }])
@@ -64,7 +60,7 @@ export default function ChatThread() {
     useEffect(() => {
         // Start of a new conversation
         if (location.state && thread.length == 0) {
-            setThread((t) => [...t, { incoming: false, message: location.state.initialMessage}])
+            setThread((t) => [...t, { incoming: false, message: location.state.initialMessage }])
             window.history.replaceState({}, document.title) // clear the location state after consuming the initial message
         }
 
@@ -73,15 +69,24 @@ export default function ChatThread() {
         }
     }, [])
 
+    // Fetch Thread Data
+    useEffect(() => {
+        (async function () {
+            const t = await getThread(sender, threadId)
+            setThread(t.messages)
+            setRecipient(t.recipient)
+        })()
+    }, [])
+
     useEffect(() => {
         socket.on(`chat::${recipient}:${sender}`, (message) => {
-            setThread((t) => [...t, { incoming: true, message }])
-        })   
+            setThread((t) => [...t, { incoming: true, message, recipient: sender }])
+        })
 
         return () => {
             socket.off(`chat::${recipient}:${sender}`)
         }
-    }, [])
+    }, [recipient])
 
     return (
         <>
@@ -101,8 +106,8 @@ export default function ChatThread() {
                 zIndex: 0,
             }} ref={threadRef}>
                 {
-                    thread.map(({ incoming, message }, i) => (
-                        <ChatBubble key={i} incoming={incoming} message={message} />
+                    thread.map(({ message, recipient }, i) => (
+                        <ChatBubble key={i} incoming={sender == recipient} message={message} />
                     ))
                 }
             </Box>

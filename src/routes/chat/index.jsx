@@ -7,9 +7,9 @@ import { getChats } from "../../api/chat";
 import { useState } from "react";
 import { socket } from "../../api/socket";
 
-function ChatListItem({ username, message, unread }) {
+function ChatListItem({ id, username, message, unread }) {
     return (
-        <Box display="flex" alignItems="center" gap={2} p={1} component={Link} href={`/chat/t/${username}`} sx={{
+        <Box display="flex" alignItems="center" gap={2} p={1} component={Link} href={`/chat/t/${id}`} sx={{
             borderRadius: 1,
             textDecoration: 'none',
             '&:hover': {
@@ -33,24 +33,20 @@ function ChatListItem({ username, message, unread }) {
 
 export default function Chat() {
     const [chats, setChats] = useState([])
+    const user = localStorage.getItem('username')
+
+    async function updateChats() {
+        const chats = await getChats(user)
+        setChats(chats)
+    }
 
     useEffect(() => {
-        (async function () {
-            console.log('iife')
-            const user = localStorage.getItem('username')
-            const chats = await getChats(user)
-            setChats(chats)
-        })()
+        updateChats()
     }, [])
 
-    const user = localStorage.getItem('username')
     useEffect(() => {
         socket.on(`new message:${user}`, () => {
-            (async function () {
-                console.log('iife 2')
-                const chats = await getChats(user)
-                setChats(chats)
-            })()
+            updateChats()
         })
 
         return () => {
@@ -66,7 +62,7 @@ export default function Chat() {
                 {chats.length > 0 ?
                     chats.map(
                         ({ _id, recipient, lastMessage, unread }) => (
-                            <ChatListItem key={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} />
+                            <ChatListItem key={_id} id={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} />
                         )
                     )
                     :
