@@ -2,7 +2,7 @@ import { Box } from "@mui/system";
 import { IconButton, InputAdornment, Link, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { socket } from '../../api/socket'
 
@@ -17,8 +17,17 @@ export default function NewChat() {
     const sender = localStorage.getItem('username') // current user
     const handleSendMessage = () => {
         socket.emit('chat', { sender, recipient, message })
-        navigate(`/chat/t/${recipient}`, { state: { initialMessage: message }})
     }
+
+    useEffect(() => {
+        socket.on(`chat init::${sender}:${recipient}`, (threadId) => {
+            navigate(`/chat/t/${threadId}`, { state: { initialMessage: message } })
+        })
+
+        return () => {
+            socket.off(`chat init::${sender}:${recipient}`)
+        }
+    }, [recipient])
 
     return (
         <>
