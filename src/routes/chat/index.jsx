@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Fab, Link, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
@@ -8,7 +9,7 @@ import { useState } from "react";
 import { socket, markThreadAsRead } from "../../api/socket";
 import newMsgSound from '../../assets/new-message.mp3'
 
-function ChatListItem({ id, username, message, unread }) {
+function ChatListItem({ id, username, message, unread, timestamp }) {
     function handleReadChat() {
         const user = localStorage.getItem('username')
         markThreadAsRead(id, user)
@@ -26,7 +27,16 @@ function ChatListItem({ id, username, message, unread }) {
                 <PersonIcon sx={{ color: '#6E42CC' }} />
             </Box>
             <Box flex={1} sx={{ overflow: 'hidden' }}>
-                <Typography variant="body2" fontWeight={unread ? 700 : 400} color={unread ? '#181818' : '#434343'}>@{username}</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" fontWeight={unread ? 700 : 400} color={unread ? '#181818' : '#434343'}>
+                        @{username}
+                    </Typography>
+                    <Typography variant="subtitle2" color={unread ? '#181818' : '#9a9a9a'}>
+                        {
+                            dayjs().diff(timestamp, 'hours') > 23 ? dayjs(timestamp).format('MMM D · h:mm A') : dayjs(timestamp).format('h:mm A')
+                        }
+                    </Typography>
+                </Box>
                 <Typography variant="body2" fontWeight={unread ? 700 : 400} color={unread ? '#181818' : '#5a5a5a'} sx={{
                     textOverflow: 'ellipsis',
                     overflow: 'hidden',
@@ -74,7 +84,7 @@ export default function Chat() {
                 {chats.length > 0 ?
                     chats.map(
                         ({ _id, recipient, lastMessage, unread }) => (
-                            <ChatListItem key={_id} id={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} />
+                            <ChatListItem key={_id} id={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} timestamp={lastMessage.updatedAt} />
                         )
                     )
                     :
