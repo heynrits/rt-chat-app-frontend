@@ -5,7 +5,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { socket } from '../../api/socket'
+import { markThreadAsRead, socket } from '../../api/socket'
 import { getThread } from "../../api/chat";
 
 function ChatBubble({ incoming, message }) {
@@ -81,6 +81,7 @@ export default function ChatThread() {
     useEffect(() => {
         socket.on(`chat::${recipient}:${sender}`, (message) => {
             setThread((t) => [...t, { incoming: true, message, recipient: sender }])
+            markThreadAsRead(threadId, sender)
         })
 
         return () => {

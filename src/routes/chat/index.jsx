@@ -5,9 +5,15 @@ import AddIcon from '@mui/icons-material/Add';
 import { useEffect } from "react";
 import { getChats } from "../../api/chat";
 import { useState } from "react";
-import { socket } from "../../api/socket";
+import { socket, markThreadAsRead } from "../../api/socket";
+import newMsgSound from '../../assets/new-message.mp3'
 
 function ChatListItem({ id, username, message, unread }) {
+    function handleReadChat() {
+        const user = localStorage.getItem('username')
+        markThreadAsRead(id, user)
+    }
+
     return (
         <Box display="flex" alignItems="center" gap={2} p={1} component={Link} href={`/chat/t/${id}`} sx={{
             borderRadius: 1,
@@ -15,7 +21,7 @@ function ChatListItem({ id, username, message, unread }) {
             '&:hover': {
                 background: '#eae6f2'
             }
-        }}>
+        }} onClick={handleReadChat}>
             <Box sx={{ width: 50, height: 50, background: '#d9d9d9', borderRadius: 10, display: 'grid', placeItems: 'center' }}>
                 <PersonIcon sx={{ color: '#6E42CC' }} />
             </Box>
@@ -40,6 +46,11 @@ export default function Chat() {
         setChats(chats)
     }
 
+    function playNewMsgSound() {
+        const notifSound = new Audio(newMsgSound)
+        notifSound.play()
+    }
+
     useEffect(() => {
         updateChats()
     }, [])
@@ -47,6 +58,7 @@ export default function Chat() {
     useEffect(() => {
         socket.on(`new message:${user}`, () => {
             updateChats()
+            playNewMsgSound()
         })
 
         return () => {
