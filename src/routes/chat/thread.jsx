@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Box } from "@mui/system";
 import { IconButton, InputAdornment, Link, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -5,8 +6,10 @@ import SendIcon from '@mui/icons-material/Send';
 import { useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect } from "react";
+import { debounce } from "lodash"
 import { markThreadAsRead, socket } from '../../api/socket'
 import { getThread } from "../../api/chat";
+import { motion } from "framer-motion"
 
 function ChatBubble({ incoming, message }) {
     const adjacentSibling = `& + .${incoming ? 'outgoing-chat' : 'incoming-chat'}`;
@@ -32,6 +35,43 @@ function ChatBubble({ incoming, message }) {
     )
 }
 
+const TypingIndicator = React.forwardRef((props, ref) => (
+    <Box ref={ref} className="hidden" sx={{
+        px: 3,
+        py: 1.5,
+        background: '#DDDDDD',
+        display: 'inline-block',
+        borderRadius: 1,
+        flexShrink: 1,
+        alignSelf: 'flex-start',
+        mr: 8,
+        ml: 0,
+        transition: 'visibility 0.3s ease-in',
+        '&.hidden': {
+            visibility: 'hidden',
+            display: 'none'
+        },
+        '& + .incoming-chat': {
+            mt: 2
+        },
+        '& .ti-dot': {
+            width: 5,
+            height: 5,
+            borderRadius: 5,
+            display: 'inline-block',
+            background: '#999',
+            '&:not(:last-child)': {
+                mr: 0.5,
+            }
+        },
+
+    }}>
+        <motion.span className="ti-dot" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0, repeatDelay: 0.6, }} />
+        <motion.span className="ti-dot" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.3, repeatDelay: 0.6, }} />
+        <motion.span className="ti-dot" animate={{ opacity: [0, 1, 0] }} transition={{ duration: 1, repeat: Infinity, delay: 0.6, repeatDelay: 0.6, }} />
+    </Box>
+))
+
 export default function ChatThread() {
     const sender = localStorage.getItem('username') // current user
 
@@ -43,10 +83,16 @@ export default function ChatThread() {
 
     const [thread, setThread] = useState([])
     const threadRef = useRef()
+    const typingIndicatorRef = useRef()
     const handleSendMessage = () => {
         setThread((t) => [...t, { incoming: false, message }])
         setMessage('')
         socket.emit('chat', { sender, recipient, message })
+    }
+
+    function handleInputChange(e) {
+        setMessage(e.target.value)
+        socket.emit('chat::typing', { threadId, sender, recipient })
     }
 
     const scrollToBottom = () => {
@@ -78,14 +124,27 @@ export default function ChatThread() {
         })()
     }, [])
 
+    // Only executes 3 seconds after the last call to the debounced function
+    const hideTypingIndicator = debounce(() => {
+        typingIndicatorRef.current.classList.add('hidden')
+    }, 3000)
+
     useEffect(() => {
         socket.on(`chat::${recipient}:${sender}`, (message) => {
             setThread((t) => [...t, { incoming: true, message, recipient: sender }])
             markThreadAsRead(threadId, sender)
+            hideTypingIndicator.flush()
+        })
+
+        socket.on(`chat:typing::${threadId}:${recipient}`, () => {
+            typingIndicatorRef.current.classList.remove('hidden')
+            scrollToBottom()
+            hideTypingIndicator()
         })
 
         return () => {
             socket.off(`chat::${recipient}:${sender}`)
+            socket.off(`chat:typing::${threadId}`)
         }
     }, [recipient])
 
@@ -111,8 +170,9 @@ export default function ChatThread() {
                         <ChatBubble key={i} incoming={sender == recipient} message={message} />
                     ))
                 }
-            </Box>
 
+                <TypingIndicator ref={typingIndicatorRef} />
+            </Box>
 
             <Box display="flex" alignItems="center" gap={2} sx={{
                 px: 4,
@@ -127,9 +187,9 @@ export default function ChatThread() {
                     sx={{ flex: 1 }}
                     color="purple"
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={handleInputChange}
                     onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
+                        if (e.key === 'Enter' && message.length) {
                             handleSendMessage()
                         }
                     }}
