@@ -13,7 +13,6 @@ export default function Landing() {
     
         if (hasUser) {
             navigate('/chat')
-            return null
         }
     }, [])
 
