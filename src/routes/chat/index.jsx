@@ -100,7 +100,7 @@ export default function Chat() {
 
             </Box>
 
-            <Fab color="purple" sx={{ position: "absolute", right: 32, bottom: 32 }} component={Link} href="/chat/new">
+            <Fab color="purple" sx={{ position: "fixed", right: 32, bottom: 32 }} component={Link} href="/chat/new">
                 <AddIcon sx={{ color: "#fff" }} />
             </Fab>
         </Box>
