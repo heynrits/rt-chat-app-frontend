@@ -48,6 +48,11 @@ export default function Landing() {
                         </InputAdornment>
                     )
                 }}
+                onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                        handleClickEnter()
+                    }
+                }}
             />
             <Button variant='contained' color="purple" fullWidth sx={{ mt: 2, p: 1.5, color: 'white' }} onClick={handleClickEnter}>Enter</Button>
         </Box>
