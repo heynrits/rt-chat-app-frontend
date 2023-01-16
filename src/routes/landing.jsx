@@ -49,7 +49,7 @@ export default function Landing() {
                     )
                 }}
             />
-            <Button variant='contained' fullWidth sx={{ mt: 2, p: 1.5 }} onClick={handleClickEnter}>Enter</Button>
+            <Button variant='contained' color="purple" fullWidth sx={{ mt: 2, p: 1.5, color: 'white' }} onClick={handleClickEnter}>Enter</Button>
         </Box>
     )
 }
