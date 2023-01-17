@@ -65,6 +65,7 @@ export default function Landing() {
                 transition={{ duration: 1.5, ease: 'circOut' }}
                 style={{
                     width: '100%',
+                    maxWidth: 500,
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: 'column'
