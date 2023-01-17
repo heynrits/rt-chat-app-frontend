@@ -1,16 +1,19 @@
+import { motion } from 'framer-motion'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import { Box } from '@mui/system'
-import { Button, InputAdornment } from '@mui/material'
+import { deepPurple } from '@mui/material/colors'
+import { Button, InputAdornment, SvgIcon } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { ReactComponent as MessageIcon } from '../assets/icons8-messages-150.svg'
 
 export default function Landing() {
     const navigate = useNavigate();
 
     useEffect(() => {
         const hasUser = localStorage.getItem('username')
-    
+
         if (hasUser) {
             navigate('/chat')
         }
@@ -32,29 +35,70 @@ export default function Landing() {
         <Box display="flex" alignItems="center" flexDirection="column" width="100%" sx={{
             height: '100vh',
             px: 4,
-            justifyContent: 'center'
+            justifyContent: 'center',
+            backgroundColor: deepPurple[500],
         }}>
-            <Typography variant='h3' pb={10} textAlign="center">Welcome to Chat!</Typography>
-            <Typography variant='body1'>Enter a username:</Typography>
-            <TextField
-                id="username"
-                variant="standard"
-                color="purple"
-                fullWidth
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            @
-                        </InputAdornment>
-                    )
-                }}
-                onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                        handleClickEnter()
-                    }
-                }}
-            />
-            <Button variant='contained' color="purple" fullWidth sx={{ mt: 2, p: 1.5, color: 'white' }} onClick={handleClickEnter}>Enter</Button>
+            {/* Icon, Welcome Text */}
+            <motion.div
+                initial={{ opacity: 1, scale: 0, translateY: 100 }}
+                animate={{ opacity: 1, scale: 1, translateY: 0 }}
+                transition={{ duration: 1.5, ease: 'circOut' }}
+            >
+                <SvgIcon
+                    inheritViewBox
+                    component={MessageIcon}
+                    sx={{ fontSize: 100, color: '#fff' }}
+                />
+            </motion.div>
+            <motion.div
+                initial={{ opacity: 0, translateY: -50 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ duration: 1, delay: 0.5, ease: 'circOut' }}
+            >
+                <Typography variant='h5' component='div' pb={10} color={deepPurple[50]} textAlign="center">Welcome to Chat!</Typography>
+            </motion.div>
+
+            {/* Login Form */}
+            <motion.div
+                initial={{ translateY: -50 }}
+                animate={{ translateY: 0 }}
+                transition={{ duration: 1.5, ease: 'circOut' }}
+                style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexDirection: 'column'
+                }}>
+                <Typography mb={1} variant='body1' color={deepPurple[50]}>Enter a username:</Typography>
+                <TextField
+                    label="Your username"
+                    sx={{
+                        '.MuiFilledInput-root': {
+                            background: deepPurple[200],
+                            color: 'white'
+                        },
+                    }}
+                    id="username"
+                    variant="filled"
+                    color="white"
+                    // sx={{ color: deepPurple[50] }}
+                    fullWidth
+                    InputProps={{
+                        style: { color: 'white' },
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Typography style={{ color: '#fff' }}>@</Typography>
+                            </InputAdornment>
+                        )
+                    }}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            handleClickEnter()
+                        }
+                    }}
+                />
+                <Button variant='contained' color="white" fullWidth sx={{ mt: 2, p: 1.5, color: deepPurple[500], fontWeight: 700 }} onClick={handleClickEnter}>Enter</Button>
+            </motion.div>
         </Box>
     )
 }

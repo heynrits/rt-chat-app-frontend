@@ -30,6 +30,11 @@ const theme = createTheme({
       main: '#6E42CC',
       light: '#845ED4',
       dark: '#512BA1',
+    },
+    white: {
+      main: '#fff',
+      light: '#fff',
+      dark: '#fff',
     }
   },
   components: {
