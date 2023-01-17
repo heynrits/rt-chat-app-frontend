@@ -8,6 +8,7 @@ import { getChats } from "../../api/chat";
 import { useState } from "react";
 import { socket, markThreadAsRead } from "../../api/socket";
 import newMsgSound from '../../assets/new-message.mp3'
+import AccountMenu from '../../components/AccountMenu';
 
 function ChatListItem({ id, username, message, unread, timestamp }) {
     function handleReadChat() {
@@ -78,8 +79,10 @@ export default function Chat() {
 
     return (
         <Box sx={{ px: 4 }}>
-            <Typography variant='h3' py={5} textAlign="center" color="#6E42CC">Chat</Typography>
-
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography variant='h3' py={5} textAlign="center" color="#6E42CC">Chat</Typography>
+                <AccountMenu user={user} />
+            </Box>
             <Box>
                 {chats.length > 0 ?
                     chats.map(
