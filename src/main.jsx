@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom'
 import Root from './routes/root'
 import './index.css'
+import ProtectedRoute from './components/ProtectedRoute'
 import Landing from './routes/landing'
 import Chat from './routes/chat'
 import NewChat from './routes/chat/new'
@@ -21,19 +22,35 @@ const router = createBrowserRouter([
     children: [
       {
         path: 'welcome',
-        element: <Landing />
+        element: (
+          <ProtectedRoute unauthenticatedOnly>
+            <Landing />
+          </ProtectedRoute>
+        )
       },
       {
         path: 'chat',
-        element: <Chat />,
+        element: (
+          <ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'chat/new',
-        element: <NewChat />
+        element: (
+          <ProtectedRoute>
+            <NewChat />
+          </ProtectedRoute>
+        )
       },
       {
         path: 'chat/t/:threadId',
-        element: <ChatThread />
+        element: (
+          <ProtectedRoute>
+            <ChatThread />
+          </ProtectedRoute>
+        )
       }
     ]
   }
