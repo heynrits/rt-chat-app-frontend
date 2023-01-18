@@ -12,8 +12,11 @@ import Chat from './routes/chat'
 import NewChat from './routes/chat/new'
 import ChatThread from './routes/chat/thread'
 import Axios from 'axios'
+import { getThread } from './api/chat'
 
 Axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL
+
+const user = localStorage.getItem('username')
 
 const router = createBrowserRouter([
   {
@@ -46,6 +49,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'chat/t/:threadId',
+        loader: async ({params}) => getThread(user, params.threadId, { page: 1 }),
         element: (
           <ProtectedRoute>
             <ChatThread />

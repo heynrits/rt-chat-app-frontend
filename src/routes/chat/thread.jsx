@@ -1,21 +1,22 @@
 import * as React from 'react'
 import { Box } from "@mui/system";
-import { IconButton, InputAdornment, Link, TextField, Typography } from "@mui/material";
+import { CircularProgress, IconButton, Link, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
-import { useRef, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useRef, useState, useCallback } from "react";
+import { useLoaderData, useLocation, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { debounce } from "lodash"
 import { markThreadAsRead, socket } from '../../api/socket'
 import { getThread } from "../../api/chat";
 import { motion } from "framer-motion"
 
-function ChatBubble({ incoming, message }) {
+const ChatBubble = React.forwardRef(({ incoming, message }, ref) => {
     const adjacentSibling = `& + .${incoming ? 'outgoing-chat' : 'incoming-chat'}`;
 
     return (
         <Box
+            ref={ref}
             className={incoming ? 'incoming-chat' : 'outgoing-chat'} sx={{
                 px: 3,
                 py: 1.5,
@@ -33,7 +34,7 @@ function ChatBubble({ incoming, message }) {
             <Typography variant="body2" color={incoming ? "#2B2B2B" : "#fff"}>{message}</Typography>
         </Box>
     )
-}
+})
 
 const TypingIndicator = React.forwardRef((props, ref) => (
     <Box ref={ref} className="hidden" sx={{
@@ -73,6 +74,7 @@ const TypingIndicator = React.forwardRef((props, ref) => (
 ))
 
 export default function ChatThread() {
+    const initialThread = useLoaderData()
     const sender = localStorage.getItem('username') // current user
 
     const { threadId } = useParams()
@@ -81,11 +83,33 @@ export default function ChatThread() {
     const location = useLocation()
     const [message, setMessage] = useState('')
 
+    // Pagination
+    const [pageNumber, setPageNumber] = useState(1)
+    const [hasNext, setHasNext] = useState(false)
+    const [loading, setLoading] = useState(false)
+
     const [thread, setThread] = useState([])
     const threadRef = useRef()
     const typingIndicatorRef = useRef()
+
+    // This watches if the top-most message bubble becomes visible in the viewport.
+    // If it is, it increments the pageNumber so that the Fetch Thread Data side effect
+    // updates the thread content with the next set of messages in the conversation
+    const observer = useRef()
+    const topMessageBubbleRef = useCallback(node => {
+        if (loading) return
+        if (observer.current) observer.current.disconnect()
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasNext) {
+                setLoading(true)
+                setPageNumber(prevPageNumber => prevPageNumber + 1)
+            }
+        })
+        if (node) observer.current.observe(node)
+    }, [loading, hasNext])
+
     const handleSendMessage = () => {
-        setThread((t) => [...t, { incoming: false, message }])
+        setThread((t) => [{ incoming: false, message }, ...t])
         setMessage('')
         socket.emit('chat', { sender, recipient, message })
     }
@@ -100,15 +124,17 @@ export default function ChatThread() {
     }
 
     useEffect(() => {
-        scrollToBottom()
-    }, [thread])
-
-    useEffect(() => {
         // Start of a new conversation
         if (location.state && thread.length == 0) {
             setThread((t) => [...t, { incoming: false, message: location.state.initialMessage }])
             window.history.replaceState({}, document.title) // clear the location state after consuming the initial message
+        } else {
+            setThread(initialThread.messages)
+            setRecipient(initialThread.recipient)
+            setHasNext(initialThread.hasNext)
         }
+
+        scrollToBottom()
 
         return () => {
             setThread([])
@@ -117,12 +143,16 @@ export default function ChatThread() {
 
     // Fetch Thread Data
     useEffect(() => {
-        (async function () {
-            const t = await getThread(sender, threadId)
-            setThread(t.messages)
-            setRecipient(t.recipient)
-        })()
-    }, [])
+        (async function (page) {
+            if (pageNumber > 1) {
+                const t = await getThread(sender, threadId, { page })
+                setThread((prevThread) => [...prevThread, ...t.messages])
+                setRecipient(t.recipient)
+                setHasNext(t.hasNext)
+                setLoading(false)
+            }
+        })(pageNumber)
+    }, [pageNumber])
 
     // Only executes 3 seconds after the last call to the debounced function
     const hideTypingIndicator = debounce(() => {
@@ -131,7 +161,7 @@ export default function ChatThread() {
 
     useEffect(() => {
         socket.on(`chat::${recipient}:${sender}`, (message) => {
-            setThread((t) => [...t, { incoming: true, message, recipient: sender }])
+            setThread((t) => [{ incoming: true, message, recipient: sender }, ...t])
             markThreadAsRead(threadId, sender)
             hideTypingIndicator.flush()
         })
@@ -160,18 +190,26 @@ export default function ChatThread() {
                 <Typography variant="h6" flex={1}>@{recipient}</Typography>
             </Box>
 
-            <Box display="flex" flexDirection="column" gap={1} px={4} py={2} sx={{
+            <Box display="flex" flexDirection="column-reverse" gap={1} px={4} py={2} sx={{
                 height: 'calc(100vh - 176px)',
                 overflowY: 'scroll',
                 zIndex: 0,
             }} ref={threadRef}>
+                <TypingIndicator ref={typingIndicatorRef} />
+
                 {
-                    thread.map(({ message, recipient }, i) => (
-                        <ChatBubble key={i} incoming={sender == recipient} message={message} />
-                    ))
+                    thread.map(({ message, recipient }, i) => {
+                        if (thread.length == i + 1) {
+                            return <ChatBubble ref={topMessageBubbleRef} key={i} incoming={sender == recipient} message={message} />
+                        } else {
+                            return <ChatBubble key={i} incoming={sender == recipient} message={message} />
+                        }
+                    })
                 }
 
-                <TypingIndicator ref={typingIndicatorRef} />
+                {
+                    loading ? <CircularProgress color="purple" sx={{ alignSelf: 'center' }} /> : null
+                }
             </Box>
 
             <Box display="flex" alignItems="center" gap={2} sx={{
