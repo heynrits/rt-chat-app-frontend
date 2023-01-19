@@ -124,6 +124,7 @@ export default function ChatThread() {
     }
 
     useEffect(() => {
+        setPageNumber(1)
         setThread(initialThread.messages)
         setRecipient(initialThread.recipient)
         setHasNext(initialThread.hasNext)
@@ -132,7 +133,7 @@ export default function ChatThread() {
         return () => {
             setThread([])
         }
-    }, [])
+    }, [initialThread])
 
     // Fetch Thread Data
     useEffect(() => {
