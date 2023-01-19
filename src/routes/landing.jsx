@@ -1,11 +1,11 @@
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import { Box } from '@mui/system'
 import { deepPurple } from '@mui/material/colors'
 import { Button, InputAdornment, SvgIcon } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
 import { ReactComponent as MessageIcon } from '../assets/icons8-messages-150.svg'
 
 export default function Landing() {

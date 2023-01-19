@@ -1,16 +1,16 @@
+import { useEffect, useState } from "react";
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import dayjs from 'dayjs'
-import { Fab, IconButton, Link, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { IconButton, Link, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
-import AddIcon from '@mui/icons-material/Add';
-import { useEffect } from "react";
+import CreateIcon from '@mui/icons-material/Create';
+
+import AccountMenu from '../../components/AccountMenu';
+
 import { getChats } from "../../api/chat";
-import { useState } from "react";
 import { socket, markThreadAsRead } from "../../api/socket";
 import newMsgSound from '../../assets/new-message.mp3'
-import AccountMenu from '../../components/AccountMenu';
-import CreateIcon from '@mui/icons-material/Create';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
 
 function ChatListItem({ id, username, message, unread, timestamp, onClick }) {
     function handleReadChat() {

@@ -1,15 +1,15 @@
 import * as React from 'react'
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useLoaderData, useLocation, useOutletContext, useParams } from "react-router-dom";
+import { debounce } from "lodash"
+import { motion } from "framer-motion"
 import { Box } from "@mui/system";
 import { CircularProgress, IconButton, Link, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
-import { useRef, useState, useCallback } from "react";
-import { useLoaderData, useLocation, useOutletContext, useParams } from "react-router-dom";
-import { useEffect } from "react";
-import { debounce } from "lodash"
+
 import { markThreadAsRead, socket } from '../../api/socket'
 import { getThread } from "../../api/chat";
-import { motion } from "framer-motion"
 
 const ChatBubble = React.forwardRef(({ incoming, message }, ref) => {
     const adjacentSibling = `& + .${incoming ? 'outgoing-chat' : 'incoming-chat'}`;

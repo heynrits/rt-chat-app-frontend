@@ -4,14 +4,16 @@ import {
   createBrowserRouter,
   RouterProvider
 } from 'react-router-dom'
+import Axios from 'axios'
+
 import Root from './routes/root'
-import './index.css'
 import ProtectedRoute from './components/ProtectedRoute'
 import Landing from './routes/landing'
 import Chat from './routes/chat'
 import NewChat from './routes/chat/new'
 import ChatThread from './routes/chat/thread'
-import Axios from 'axios'
+import './index.css'
+
 import chatThreadLoader from './loaders/chatThreadLoader'
 
 Axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL

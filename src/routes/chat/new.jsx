@@ -1,9 +1,10 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/system";
 import { IconButton, InputAdornment, Link, TextField, Typography } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { socket } from '../../api/socket'
 
 export default function NewChat() {
