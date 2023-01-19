@@ -10,7 +10,7 @@ import { socket, markThreadAsRead } from "../../api/socket";
 import newMsgSound from '../../assets/new-message.mp3'
 import AccountMenu from '../../components/AccountMenu';
 import CreateIcon from '@mui/icons-material/Create';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 
 function ChatListItem({ id, username, message, unread, timestamp }) {
     function handleReadChat() {
@@ -81,14 +81,16 @@ export default function Chat() {
 
     // For responsive layout
     const { threadId: openThread } = useParams()
+    const { pathname } = useLocation()
     const desktopView = useMediaQuery('(min-width: 900px)')
-    const hasOpenThread = openThread !== undefined
+    const hasOpenThread = openThread !== undefined || pathname === '/chat/new'
 
     return (
         <Box sx={{ display: hasOpenThread && desktopView ? 'flex' : 'block' }}>
             {/* Thread List */}
             <Box sx={{
                 px: 4,
+                width: '100%',
                 maxWidth: hasOpenThread ? '400px' : '100%',
                 height: '100vh',
                 overflowY: 'scroll',

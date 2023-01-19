@@ -45,16 +45,16 @@ const router = createBrowserRouter([
                 <ChatThread />
               </ProtectedRoute>
             )
-          }
+          },
+          {
+            path: 'new',
+            element: (
+              <ProtectedRoute>
+                <NewChat />
+              </ProtectedRoute>
+            )
+          },
         ]
-      },
-      {
-        path: 'chat/new',
-        element: (
-          <ProtectedRoute>
-            <NewChat />
-          </ProtectedRoute>
-        )
       },
     ]
   }

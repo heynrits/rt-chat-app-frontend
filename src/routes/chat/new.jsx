@@ -52,6 +52,7 @@ export default function NewChat() {
                     onChange={(e) => setRecipient(e.target.value)}
                 />
             </Box>
+            <Box sx={{ height: 'calc(100vh - 216px)', position: 'relative'}}>
             <Typography variant="subtitle2" sx={{
                 color: '#888',
                 textAlign: 'center',
@@ -60,13 +61,12 @@ export default function NewChat() {
                 left: '50%',
                 transform: 'translate(-50%, -50%)'
             }}>Enter a username and send your first message to start chatting!</Typography>
+            </Box>
             <Box display="flex" alignItems="center" gap={2} sx={{
                 px: 4,
                 py: 2,
                 width: '100%',
                 background: '#f0f0f0',
-                position: 'absolute',
-                bottom: 0,
             }}>
                 <TextField
                     variant="standard"
