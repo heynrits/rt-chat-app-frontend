@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Fab, IconButton, Link, Typography, useMediaQuery } from "@mui/material";
+import { Fab, IconButton, Link, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
@@ -111,9 +111,11 @@ export default function Chat() {
                     }}
                 >
                     <Typography variant='h3' py={5} textAlign="center" color="#6E42CC" mr='auto'>Chat</Typography>
-                    <IconButton aria-label='new message' color="purple" component={Link} href="/chat/new">
-                        <CreateIcon />
-                    </IconButton>
+                    <Tooltip title="New Message">
+                        <IconButton aria-label='new message' color="purple" component={Link} href="/chat/new">
+                            <CreateIcon />
+                        </IconButton>
+                    </Tooltip>
                     <AccountMenu user={user} />
                 </Box>
                 <Box>
