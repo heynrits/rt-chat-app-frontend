@@ -12,6 +12,7 @@ export default function Landing() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        document.title = 'Welcome to Chat!'
         const hasUser = localStorage.getItem('username')
 
         if (hasUser) {

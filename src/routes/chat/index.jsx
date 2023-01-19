@@ -68,6 +68,7 @@ export default function Chat() {
     }
 
     useEffect(() => {
+        document.title = 'Chat!'
         updateChats()
     }, [])
 
