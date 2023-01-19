@@ -12,10 +12,13 @@ import AccountMenu from '../../components/AccountMenu';
 import CreateIcon from '@mui/icons-material/Create';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 
-function ChatListItem({ id, username, message, unread, timestamp }) {
+function ChatListItem({ id, username, message, unread, timestamp, onClick }) {
     function handleReadChat() {
         const user = localStorage.getItem('username')
         markThreadAsRead(id, user)
+        if (unread) {
+            onClick()
+        }
     }
 
     return (
@@ -117,7 +120,7 @@ export default function Chat() {
                     {chats.length > 0 ?
                         chats.map(
                             ({ _id, recipient, lastMessage, unread }) => (
-                                <ChatListItem key={_id} id={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} timestamp={lastMessage.updatedAt} />
+                                <ChatListItem key={_id} id={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} timestamp={lastMessage.updatedAt} onClick={updateChats} />
                             )
                         )
                         :
@@ -135,7 +138,7 @@ export default function Chat() {
 
             {/* Right Panel Container (for desktop view) -- will contain thread view */}
             <Box sx={{ flex: 1, position: 'relative', width: '100%', borderLeft: '1px solid #eee' }}>
-                <Outlet />
+                <Outlet context={[updateChats]} />
             </Box>
         </Box>
     )

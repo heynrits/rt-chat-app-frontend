@@ -4,7 +4,7 @@ import { CircularProgress, IconButton, Link, TextField, Typography } from "@mui/
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import { useRef, useState, useCallback } from "react";
-import { useLoaderData, useLocation, useParams } from "react-router-dom";
+import { useLoaderData, useLocation, useOutletContext, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { debounce } from "lodash"
 import { markThreadAsRead, socket } from '../../api/socket'
@@ -76,6 +76,7 @@ const TypingIndicator = React.forwardRef((props, ref) => (
 export default function ChatThread() {
     const initialThread = useLoaderData()
     const sender = localStorage.getItem('username') // current user
+    const [updateChats] = useOutletContext()
 
     const { threadId } = useParams()
     const [recipient, setRecipient] = useState('') // recipient user
@@ -160,6 +161,10 @@ export default function ChatThread() {
             hideTypingIndicator.flush()
         })
 
+        socket.on(`chat:sent::${sender}:${recipient}`, () => {
+            updateChats()
+        })
+
         socket.on(`chat:typing::${threadId}:${recipient}`, () => {
             typingIndicatorRef.current.classList.remove('hidden')
             scrollToBottom()
@@ -168,6 +173,7 @@ export default function ChatThread() {
 
         return () => {
             socket.off(`chat::${recipient}:${sender}`)
+            socket.off(`chat:sent::${sender}:${recipient}`)
             socket.off(`chat:typing::${threadId}`)
         }
     }, [recipient])
