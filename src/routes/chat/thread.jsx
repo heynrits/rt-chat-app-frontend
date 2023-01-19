@@ -173,7 +173,7 @@ export default function ChatThread() {
 
     return (
         <>
-            <Box p={4} display="flex" alignItems="center" gap={2} sx={{
+            <Box px={4} py={2} display="flex" alignItems="center" gap={2} sx={{
                 boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
                 zIndex: 100
             }}>

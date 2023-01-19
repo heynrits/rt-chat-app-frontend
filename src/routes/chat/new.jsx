@@ -31,7 +31,7 @@ export default function NewChat() {
 
     return (
         <>
-            <Box p={4}>
+            <Box px={4} pt={2} pb={4} sx={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
                 <IconButton aria-label="back" color="purple" component={Link} href="/chat">
                     <ArrowBackIcon />
                 </IconButton>
