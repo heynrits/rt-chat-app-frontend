@@ -123,17 +123,10 @@ export default function ChatThread() {
         threadRef.current.scrollTop = threadRef.current.scrollHeight
     }
 
-    useEffect(() => {
-        // Start of a new conversation
-        if (location.state && thread.length == 0) {
-            setThread((t) => [...t, { incoming: false, message: location.state.initialMessage }])
-            window.history.replaceState({}, document.title) // clear the location state after consuming the initial message
-        } else {
-            setThread(initialThread.messages)
-            setRecipient(initialThread.recipient)
-            setHasNext(initialThread.hasNext)
-        }
-
+    useEffect(() => {        
+        setThread(initialThread.messages)
+        setRecipient(initialThread.recipient)
+        setHasNext(initialThread.hasNext)
         scrollToBottom()
 
         return () => {

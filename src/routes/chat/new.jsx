@@ -21,7 +21,7 @@ export default function NewChat() {
 
     useEffect(() => {
         socket.on(`chat init::${sender}:${recipient}`, (threadId) => {
-            navigate(`/chat/t/${threadId}`, { state: { initialMessage: message } })
+            navigate(`/chat/t/${threadId}`)
         })
 
         return () => {
