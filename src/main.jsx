@@ -36,6 +36,17 @@ const router = createBrowserRouter([
             <Chat />
           </ProtectedRoute>
         ),
+        children: [
+          {
+            path: 't/:threadId',
+            loader: chatThreadLoader,
+            element: (
+              <ProtectedRoute>
+                <ChatThread />
+              </ProtectedRoute>
+            )
+          }
+        ]
       },
       {
         path: 'chat/new',
@@ -45,15 +56,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         )
       },
-      {
-        path: 'chat/t/:threadId',
-        loader: chatThreadLoader,
-        element: (
-          <ProtectedRoute>
-            <ChatThread />
-          </ProtectedRoute>
-        )
-      }
     ]
   }
 ])

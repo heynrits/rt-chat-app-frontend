@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Fab, Link, Typography } from "@mui/material";
+import { Fab, IconButton, Link, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
 import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,6 +9,8 @@ import { useState } from "react";
 import { socket, markThreadAsRead } from "../../api/socket";
 import newMsgSound from '../../assets/new-message.mp3'
 import AccountMenu from '../../components/AccountMenu';
+import CreateIcon from '@mui/icons-material/Create';
+import { Outlet, useParams } from 'react-router-dom';
 
 function ChatListItem({ id, username, message, unread, timestamp }) {
     function handleReadChat() {
@@ -77,35 +79,62 @@ export default function Chat() {
         }
     })
 
+    // For responsive layout
+    const { threadId: openThread } = useParams()
+    const desktopView = useMediaQuery('(min-width: 900px)')
+    const hasOpenThread = openThread !== undefined
+
     return (
-        <Box sx={{ px: 4 }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography variant='h3' py={5} textAlign="center" color="#6E42CC">Chat</Typography>
-                <AccountMenu user={user} />
-            </Box>
-            <Box>
-                {chats.length > 0 ?
-                    chats.map(
-                        ({ _id, recipient, lastMessage, unread }) => (
-                            <ChatListItem key={_id} id={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} timestamp={lastMessage.updatedAt} />
+        <Box sx={{ display: hasOpenThread && desktopView ? 'flex' : 'block' }}>
+            {/* Thread List */}
+            <Box sx={{
+                px: 4,
+                maxWidth: hasOpenThread ? '400px' : '100%',
+                height: '100vh',
+                overflowY: 'scroll',
+                display: hasOpenThread ? desktopView ? 'block' : 'none' : 'block'
+            }}>
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{
+                        position: 'sticky',
+                        top: 0,
+                        background: '#fff',
+                        borderBottom: '1px solid #eee'
+                    }}
+                >
+                    <Typography variant='h3' py={5} textAlign="center" color="#6E42CC" mr='auto'>Chat</Typography>
+                    <IconButton aria-label='new message' color="purple" component={Link} href="/chat/new">
+                        <CreateIcon />
+                    </IconButton>
+                    <AccountMenu user={user} />
+                </Box>
+                <Box>
+                    {chats.length > 0 ?
+                        chats.map(
+                            ({ _id, recipient, lastMessage, unread }) => (
+                                <ChatListItem key={_id} id={_id} username={recipient} message={user === lastMessage.sender ? `You: ${lastMessage.message}` : lastMessage.message} unread={unread} timestamp={lastMessage.updatedAt} />
+                            )
                         )
-                    )
-                    :
-                    <Typography variant="subtitle2" sx={{
-                        color: '#888',
-                        textAlign: 'center',
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)'
-                    }}>Tap "+" to start chatting!</Typography>
-                }
-
+                        :
+                        <Typography variant="subtitle2" sx={{
+                            color: '#888',
+                            textAlign: 'center',
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                        }}>Tap the <CreateIcon sx={{ transform: 'translateY(5px)' }} /> icon above to start chatting!</Typography>
+                    }
+                </Box>
             </Box>
 
-            <Fab color="purple" sx={{ position: "fixed", right: 32, bottom: 32 }} component={Link} href="/chat/new">
-                <AddIcon sx={{ color: "#fff" }} />
-            </Fab>
+            {/* Right Panel Container (for desktop view) -- will contain thread view */}
+            <Box sx={{ flex: 1, position: 'relative', width: '100%', borderLeft: '1px solid #eee' }}>
+                <Outlet />
+            </Box>
         </Box>
     )
 }

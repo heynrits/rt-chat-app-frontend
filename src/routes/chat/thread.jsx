@@ -123,7 +123,7 @@ export default function ChatThread() {
         threadRef.current.scrollTop = threadRef.current.scrollHeight
     }
 
-    useEffect(() => {        
+    useEffect(() => {
         setThread(initialThread.messages)
         setRecipient(initialThread.recipient)
         setHasNext(initialThread.hasNext)
@@ -184,7 +184,7 @@ export default function ChatThread() {
             </Box>
 
             <Box display="flex" flexDirection="column-reverse" gap={1} px={4} py={2} sx={{
-                height: 'calc(100vh - 176px)',
+                height: 'calc(100vh - 144px)',
                 overflowY: 'scroll',
                 zIndex: 0,
             }} ref={threadRef}>
@@ -210,8 +210,6 @@ export default function ChatThread() {
                 py: 2,
                 width: '100%',
                 background: '#f0f0f0',
-                position: 'absolute',
-                bottom: 0,
             }}>
                 <TextField
                     variant="standard"
