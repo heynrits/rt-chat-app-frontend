@@ -174,7 +174,7 @@ export default function ChatThread() {
         return () => {
             socket.off(`chat::${recipient}:${sender}`)
             socket.off(`chat:sent::${sender}:${recipient}`)
-            socket.off(`chat:typing::${threadId}`)
+            socket.off(`chat:typing::${threadId}:${recipient}`)
         }
     }, [recipient])
 
