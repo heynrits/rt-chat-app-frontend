@@ -1,8 +1,11 @@
 import * as React from 'react'
+import { useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   Outlet,
   Link as RouterLink,
+  useLocation,
+  useNavigate
 } from "react-router-dom"
 import PropTypes from 'prop-types';
 
@@ -52,6 +55,15 @@ const theme = createTheme({
 })
 
 function App() {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    if (pathname === '/') {
+      navigate('/chat')
+    }
+  }, [])
+
   return (
     <ThemeProvider theme={theme}>
       <Outlet />
